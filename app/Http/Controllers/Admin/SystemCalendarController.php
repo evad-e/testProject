@@ -10,8 +10,7 @@ class SystemCalendarController extends Controller
     public $sources = [
         [
             'model'      => '\App\Models\Booking',
-            'date_start' => 'date_start',
-            'date_end' => 'date_end',
+            'date_field' => 'date_start',
             'field'      => 'customer_name',
             'prefix'     => '',
             'suffix'     => '',
@@ -24,16 +23,15 @@ class SystemCalendarController extends Controller
         $events = [];
         foreach ($this->sources as $source) {
             foreach ($source['model']::all() as $model) {
-                $start = $model->getAttributes()[$source['date_start']];
-                $end = $model->getAttributes()[$source['date_end']];
-                if (!$start || !$end) {
+                $crudFieldValue = $model->getAttributes()[$source['date_field']];
+
+                if (!$crudFieldValue) {
                     continue;
                 }
-                
+
                 $events[] = [
                     'title' => trim($source['prefix'] . ' ' . $model->{$source['field']} . ' ' . $source['suffix']),
-                    'start' => $start,
-                    'end' => $end,
+                    'start' => $crudFieldValue,
                     'url'   => route($source['route'], $model->id),
                 ];
             }
